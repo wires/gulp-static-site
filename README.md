@@ -43,7 +43,7 @@ gulp.task('markdown', function () {
 // include all HTML files from prebuild into our site menu
 gulp.task('index', function () {
 	return gulp.src('pre-build/*.html')
-		.pipe(renderSite('template.jade'))
+		.pipe($.staticSite('template.jade'))
 		.pipe(gulp.dest('build/'))
 		.pipe($.size());
 });
