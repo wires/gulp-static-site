@@ -99,6 +99,12 @@ html
 				!= fileContents
 ```
 
+Now we need some markdown files
+
+	echo "hello from *foo*" >> foo.md
+	echo "bye from `bar`" >> bar.md
+	echo "welcome to my site" >> index.md
+
 Gulp that business:
 
 	gulp && open build/index.html      # OSX
