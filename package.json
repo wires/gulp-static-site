@@ -1,6 +1,6 @@
 {
   "name": "gulp-static-site",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "Jelle Herold <jelle@defekt.nl> (http://defekt.nl/)",
   "description": "Build a static site with gulp",
   "repository": "git://github.com/0x01/gulp-static-site.git",
