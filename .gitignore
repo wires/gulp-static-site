@@ -1,0 +1,5 @@
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+*~
+npm-debug.log
+node_modules/
