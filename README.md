@@ -15,9 +15,9 @@ List some dependencies:
     "gulp-load-plugins": "~0.3.0",
     "gulp-clean": "~0.2.4",
     "gulp-marked": "git://github.com/lmtm/gulp-marked.git",
-    "gulp-ruby-sass": "~0.4.1"
+    "gulp-ruby-sass": "~0.4.1",
     "gulp-size": "~0.1.3",
-	"gulp-static-site": "git://github.com/0x01/gulp-static-site.git"
+    "gulp-static-site": "*"
   },
   "engines": {
     "node": ">=0.10.0"
