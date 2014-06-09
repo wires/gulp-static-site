@@ -68,3 +68,8 @@ Open your file:
 	
 	open build/index.html      # OSX
 	xdg-open build/index.html  # Linux
+
+## More info
+
+For now, have a look at the source for [`gulp-static-site`](https://github.com/0x01/gulp-static-site/blob/master/index.js) and the Tree object you are operating on [`gulp-filetree/tree.js`](https://github.com/0x01/gulp-filetree/blob/master/tree.js).
+
