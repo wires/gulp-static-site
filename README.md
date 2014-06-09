@@ -1,112 +1,75 @@
 # Build static sites with gulp
 
-This is in early stages, but easy to adapt.
+This is how it works
 
-## Example
+	$ npm install gulp gulp-static-site
 
-List some dependencies:
+Then put this in your gulpfile
 
-```javascript
-{
-  "name": "my-new-site",
-  "version": "0.0.1",
-  "devDependencies": {
-    "gulp": "~3.5.6",
-    "gulp-load-plugins": "~0.3.0",
-    "gulp-clean": "~0.2.4",
-    "gulp-marked": "git://github.com/lmtm/gulp-marked.git",
-    "gulp-ruby-sass": "~0.4.1",
-    "gulp-size": "~0.1.3",
-    "gulp-static-site": "*"
-  },
-  "engines": {
-    "node": ">=0.10.0"
-  }
-}
-```
-
-Then `npm install`.
-
-Create a `gulpfile.js`:
-
-```javascript
+```js
 var gulp = require('gulp');
-var $ = require('gulp-load-plugins')();
+var static_site = require('gulp-static-site');
 
-// convert our markdown to html
-gulp.task('markdown', function () {
-	return gulp.src('*.md')
-		.pipe($.marked())
-		.pipe(gulp.dest('pre-build/'))
-});
+var paths = {
+	sources: ['content/**','templates/**'],
+	stylesheets: ['css/**']
+};
 
-// include all HTML files from prebuild into our site menu
-gulp.task('index', function () {
-	return gulp.src('pre-build/*.html')
-		.pipe($.staticSite('template.jade'))
+gulp.task('site', function () {
+	return gulp.src('content/**/*.md')
+		.pipe(static_site())
 		.pipe(gulp.dest('build/'))
-		.pipe($.size());
 });
 
-// process our stylesheet
-gulp.task('sass', function(){
-	return gulp.src('style.scss')
-		.pipe($.rubySass())
-		.pipe(gulp.dest('build/css/'));
+gulp.task('css', function () {
+	return gulp.src('css/*.css')
+		.pipe(gulp.dest('build/css'));
 });
 
-// cleanup
-gulp.task('clean', function () {
-	return gulp.src(['build/', 'pre-build/'], {read: false})
-		.pipe($.clean());
-});
-
-gulp.task('default', ['clean', 'sass', 'markdown'], function () {
-	    gulp.start('index');
+gulp.task('default', ['site','css'], function () {
+	gulp.watch(paths.sources, ['site']);
+	gulp.watch(paths.stylesheets, ['css']);
 });
 ```
 
-Example SASS file `style.scss`:
-
-```sass
-$margin: 16px;
-
-#main {
-	padding: $margin / 2;
-	margin: $margin / 2;
-}
-```
-
-Example JADE template `template.jade`:
+Example JADE template `templates/default.jade`:
 
 ```jade
 doctype html
 html
 	head
 		link(rel='stylesheet', href='http://yui.yahooapis.com/pure/0.4.2/pure-min.css')
-		link(rel='stylesheet', href='css/style.css')
+		meta(http-equiv='content-type', content='text/html; charset=UTF-8')
 	body
 		div.pure-g-r#main
 			div.pure-u-1-5
+				p Menu
 				ul
-					each file, fn in siteContents
-						li
-							if file.isCurrent
-								= file.shortName
-							else
-								a(href=file.link)= file.shortName
+					each node in page.tree.nodes
+						if node.leaf
+							li
+								a(href=node.leaf.href)= node.leaf.shortName
 			div.pure-u-4-5
-				!= fileContents
+				!= page.contents
 ```
 
 Now we need some markdown files
 
-	echo "hello from *foo*" >> foo.md
-	echo "bye from `bar`" >> bar.md
-	echo "welcome to my site" >> index.md
+	mkdir contents/
+	echo "hello from *foo*" >> contents/foo.md
+	echo "bye from `bar`" >> contents/bar.md
+	echo "welcome to my site" >> contents/index.md
 
 Gulp that business:
 
-	gulp && open build/index.html      # OSX
-	gulp && xdg-open build/index.html  # Linux
+	gulp
+
+Open your file:
+	
+	open build/index.html      # OSX
+	xdg-open build/index.html  # Linux
+
+## More info
+
+For now, have a look at the source for [`gulp-static-site`](https://github.com/0x01/gulp-static-site/blob/master/index.js) and the Tree object you are operating on [`gulp-filetree/tree.js`](https://github.com/0x01/gulp-filetree/blob/master/tree.js).
 
