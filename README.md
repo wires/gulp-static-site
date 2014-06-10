@@ -11,12 +11,12 @@ var gulp = require('gulp');
 var static_site = require('gulp-static-site');
 
 var paths = {
-	sources: ['content/**','templates/**'],
+	sources: ['contents/**','templates/**'],
 	stylesheets: ['css/**']
 };
 
 gulp.task('site', function () {
-	return gulp.src('content/**/*.md')
+	return gulp.src('contents/**/*.md')
 		.pipe(static_site())
 		.pipe(gulp.dest('build/'))
 });
@@ -63,6 +63,30 @@ Now we need some markdown files
 Gulp that business:
 
 	gulp
+	
+	[12:32:28] Using gulpfile /tmp/test/gulpfile.js
+	[12:32:28] Starting 'site'...
+	[12:32:28] Starting 'css'...
+	[12:32:28] Finished 'css' after 4.56 ms
+	[12:32:28] File tree
+	.
+	├── bar.html
+	├── foo.html
+	└── index.html
+
+	[12:32:28] loading template: templates/default.jade
+	[12:32:28] loading template: templates/default.jade
+	[12:32:28] loading template: templates/default.jade
+	[12:32:28] compiled template: templates/default.jade
+	[12:32:28] rendering [default] "bar.html"
+	[12:32:28] compiled template: templates/default.jade
+	[12:32:28] rendering [default] "foo.html"
+	[12:32:28] compiled template: templates/default.jade
+	[12:32:28] rendering [default] "index.html"
+	[12:32:28] gulp-size: total 1.75 kB
+	[12:32:28] Finished 'site' after 191 ms
+	[12:32:28] Starting 'default'...
+	[12:32:28] Finished 'default' after 12 ms
 
 Open your file:
 	
