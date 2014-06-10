@@ -1,4 +1,14 @@
-var $ = require('gulp-load-plugins')();
+
+// cheapo gulp-load-plugins
+var $ = {}; [
+	'front-matter',
+	'map',
+	'marked',
+	'filetree',
+	'size'
+].forEach(function(plugin) {
+	$[plugin.replace('-','')] = require('gulp-' + plugin);
+});
 
 var path = require('path');
 var lazypipe = require('lazypipe');
@@ -137,7 +147,7 @@ var show_tree_once = function() {
 };
 
 module.exports = lazypipe()
-	.pipe($.frontMatter, {property: 'meta', remove: true})
+//	.pipe($.frontmatter, {property: 'meta', remove: true})
 	.pipe($.map, only_published)
 	.pipe($.map, extended_attributes)
 	.pipe($.marked)
