@@ -4,6 +4,7 @@ var $ = {}; [
 	'front-matter',
 	'map',
 	'marked',
+	'util',
 	'filetree',
 	'size'
 ].forEach(function(plugin) {
@@ -66,6 +67,7 @@ function render_tmpl() {
 				}
 
 				// (asynchronously) load and compile template
+				$.util.log('loading template: ' + filename);
 				return Q
 					.nfcall(fs.readFile, filename)
 					.then(function(tmpl_content){
@@ -76,7 +78,7 @@ function render_tmpl() {
 					});
 			})
 			.fail(function(err){
-				throw new $.util.PluginError('failed compiling jade template', err);
+				$.util.log('failed compiling jade template', chalk.red(err));
 			});
 	};
 
@@ -96,7 +98,7 @@ function render_tmpl() {
 				}
 				catch(err) {
 					console.log('[' + chalk.red('ERR') +
-						'] failed rendering jade template\n\t' +
+						'] Failed rendering jade template\n\t' +
 						chalk.red(err.message));
 				}
 
@@ -108,7 +110,7 @@ function render_tmpl() {
 				});
 			})
 			.fail(function(err){
-				throw new $.util.PluginError('failed rendering jade template', err);
+				$.util.log('Failed rendering jade template', chalk.red(err));
 			});
 	});
 }
@@ -130,16 +132,11 @@ var extended_attributes = function(file) {
 	return file;
 };
 
-var only_published = function(file) {
-	if(file.meta && file.meta.public)
-		return file;
-};
-
 var show_tree_once = function() {
 	var once = false;
 	return $.map(function(file) {
 		if(!once && file.tree) {
-			console.log(archy(file.tree));
+			$.util.log('File tree\n' + archy(file.tree));
 			once = true;
 		}
 		return file;
@@ -147,11 +144,9 @@ var show_tree_once = function() {
 };
 
 module.exports = lazypipe()
-//	.pipe($.frontmatter, {property: 'meta', remove: true})
-	.pipe($.map, only_published)
 	.pipe($.map, extended_attributes)
 	.pipe($.marked)
-//	.pipe(resolve_wiki_links)
+////	.pipe(resolve_wiki_links)
 	.pipe($.filetree)
 	.pipe(show_tree_once)
 	.pipe(render_tmpl)
