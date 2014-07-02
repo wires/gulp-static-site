@@ -72,7 +72,7 @@ function render_tmpl() {
 					.nfcall(fs.readFile, filename)
 					.then(function(tmpl_content){
 						// turn template in promise returning function and cache it
-						var compiled = jade.compile(tmpl_content, {pretty:true});
+						var compiled = jade.compile(tmpl_content, {pretty:true, filename: filename});
 						$.util.log('compiled template: ' + chalk.yellow(filename));
 						return (cache[filename] = compiled);
 					});
