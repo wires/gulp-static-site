@@ -1,7 +1,6 @@
 
 // cheapo gulp-load-plugins
 var $ = {}; [
-	'front-matter',
 	'map',
 	'marked',
 	'util',
@@ -84,7 +83,7 @@ function render_tmpl() {
 
 	return $.map(function(file){
 		// select template
-		var t = (file.meta && file.meta.layout) || 'default';
+		var t = (file.frontMatter && file.frontMatter.layout) || 'default';
 
 		// pull from cache, compile if needed
 		return compile_template('templates/' + t + '.jade')
@@ -145,6 +144,7 @@ var show_tree_once = function() {
 
 module.exports = lazypipe()
 	.pipe($.map, extended_attributes)
+	.pipe(require('gulp-front-matter'))
 	.pipe($.marked)
 ////	.pipe(resolve_wiki_links)
 	.pipe($.filetree)
