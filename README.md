@@ -1,3 +1,6 @@
+[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/) [![wercker status](https://app.wercker.com/status/486c7d44015fbc0b94868b5fdeaa5d1f/s "wercker status")](https://app.wercker.com/project/bykey/486c7d44015fbc0b94868b5fdeaa5d1f)
+
+
 # Build static sites with gulp
 
 This is how it works
