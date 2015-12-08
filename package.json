@@ -5,6 +5,7 @@
   "description": "Build a static site with gulp",
   "repository": "git://github.com/wires/gulp-static-site.git",
   "homepage": "http://github.com/wires/gulp-static-site",
+  "license": "AGPL-1.0"
   "scripts": {
     "test": "standard"
   },
