@@ -3,8 +3,8 @@
   "version": "0.0.7",
   "author": "Jelle Herold <jelle@defekt.nl> (http://defekt.nl/)",
   "description": "Build a static site with gulp",
-  "repository": "git://github.com/0x01/gulp-static-site.git",
-  "homepage": "http://github.com/0x01/gulp-static-site",
+  "repository": "git://github.com/wires/gulp-static-site.git",
+  "homepage": "http://github.com/wires/gulp-static-site",
   "dependencies": {
     "archy": "0.0.2",
     "chalk": "^0.4.0",
