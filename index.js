@@ -1,27 +1,26 @@
-
 // cheapo gulp-load-plugins
 var $ = {}; [
-	'map',
-	'marked',
-	'util',
-	'filetree',
-	'size'
-].forEach(function(plugin) {
-	$[plugin.replace('-','')] = require('gulp-' + plugin);
-});
+  'map',
+  'marked',
+  'util',
+  'filetree',
+  'size'
+].forEach(function (plugin) {
+  $[plugin.replace('-', '')] = require('gulp-' + plugin)
+})
 
-var path = require('path');
-var lazypipe = require('lazypipe');
+var path = require('path')
+var lazypipe = require('lazypipe')
 
 // for async for template loading
-var Q = require('kew');
-var fs = require('fs');
-var jade = require('jade');
-var File = require('vinyl');
+var Q = require('kew')
+var fs = require('fs')
+var jade = require('jade')
+var File = require('vinyl')
 
 // showing off
-var archy = require('archy');
-var chalk = require('chalk');
+var archy = require('archy')
+var chalk = require('chalk')
 
 /**
  * Render the template, injecting the file into `page.file`.
@@ -51,103 +50,102 @@ var chalk = require('chalk');
  *
  */
 
-function render_tmpl() {
+function render_tmpl () {
+  // store compiled templates for great good
+  var cache = {}
 
-	// store compiled templates for great good
-	var cache = {};
+  var compile_template = function (filename) {
+    return Q
+      .fcall(function () {
+        // return cached immediately
+        if (cache[filename]) {
+          return cache[filename]
+        }
 
-	var compile_template = function (filename)
-	{
-		return Q
-			.fcall(function(){
-				// return cached immediately
-				if (cache[filename]) {
-					return cache[filename];
-				}
+        // (asynchronously) load and compile template
+        $.util.log('loading template: ' + filename)
+        return Q
+          .nfcall(fs.readFile, filename)
+          .then(function (tmpl_content) {
+            // turn template in promise returning function and cache it
+            var compiled = jade.compile(tmpl_content, {pretty: true, filename: filename})
+            $.util.log('compiled template: ' + chalk.yellow(filename))
+            return (cache[filename] = compiled)
+          })
+      })
+      .fail(function (err) {
+        $.util.log('failed compiling jade template', chalk.red(err))
+      })
+  }
 
-				// (asynchronously) load and compile template
-				$.util.log('loading template: ' + filename);
-				return Q
-					.nfcall(fs.readFile, filename)
-					.then(function(tmpl_content){
-						// turn template in promise returning function and cache it
-						var compiled = jade.compile(tmpl_content, {pretty:true, filename: filename});
-						$.util.log('compiled template: ' + chalk.yellow(filename));
-						return (cache[filename] = compiled);
-					});
-			})
-			.fail(function(err){
-				$.util.log('failed compiling jade template', chalk.red(err));
-			});
-	};
+  return $.map(function (file) {
+    // select template
+    var t = (file.frontMatter && file.frontMatter.layout) || 'default'
 
-	return $.map(function(file){
-		// select template
-		var t = (file.frontMatter && file.frontMatter.layout) || 'default';
+    // pull from cache, compile if needed
+    return compile_template('templates/' + t + '.jade')
+      .then(function (compiled_template) {
+        $.util.log('rendering [' + chalk.yellow(t) + '] "' +
+          chalk.magenta(path.basename(file.path)) + '"')
 
-		// pull from cache, compile if needed
-		return compile_template('templates/' + t + '.jade')
-			.then(function(compiled_template) {
-				$.util.log('rendering [' + chalk.yellow(t) + '] "' +
-					chalk.magenta(path.basename(file.path)) + '"');
+        try {
+          // render it with template variable 'page'
+          var html = compiled_template({page: file})
+        } catch (err) {
+          console.log('[' + chalk.red('ERR') +
+            '] Failed rendering jade template\n\t' +
+            chalk.red(err.message))
+        }
 
-				try {
-					// render it with template variable 'page'
-					var html = compiled_template({page: file});
-				}
-				catch(err) {
-					console.log('[' + chalk.red('ERR') +
-						'] Failed rendering jade template\n\t' +
-						chalk.red(err.message));
-				}
-
-				return new File({
-					cwd: file.cwd,
-					base: file.base,
-					path: file.path.replace(/\.md$/, '.html'),
-					contents: new Buffer(html)
-				});
-			})
-			.fail(function(err){
-				$.util.log('Failed rendering jade template', chalk.red(err));
-			});
-	});
+        return new File({
+          cwd: file.cwd,
+          base: file.base,
+          path: file.path.replace(/\.md$/, '.html'),
+          contents: new Buffer(html)
+        })
+      })
+      .fail(function (err) {
+        $.util.log('Failed rendering jade template', chalk.red(err))
+      })
+  })
 }
 
 // replace [[My Page]] with <a href='My-Page.html'>My Page</a>
-var resolve_wiki_links = function() {
-	return $.replace(/\[\[(.*?)\]\]/g,
-		function wikiLink(match, text){
-			var href = text.trim().replace(/ /g,'-') + '.html';
-			return '<a href="' + href + '">' + text + '</a>';
-		})
-};
+/*
+var resolve_wiki_links = function () {
+  return $.replace(/\[\[(.*?)\]\]/g,
+    function wikiLink (match, text) {
+      var href = text.trim().replace(/ /g, '-') + '.html'
+      return '<a href="' + href + '">' + text + '</a>'
+    })
+}
+*/
 
-var extended_attributes = function(file) {
-	file.path = file.path && file.path.replace(/\.md$/, '.html');
-	file.basename = path.basename(file.path);
-	file.shortName = file.basename && file.basename.replace(/\.html$/, '');
-	file.href = file.relative
-	return file;
-};
+var extended_attributes = function (file) {
+  file.path = file.path && file.path.replace(/\.md$/, '.html')
+  file.basename = path.basename(file.path)
+  file.shortName = file.basename && file.basename.replace(/\.html$/, '')
+  file.href = file.relative
+  return file
+}
 
-var show_tree_once = function() {
-	var once = false;
-	return $.map(function(file) {
-		if(!once && file.tree) {
-			$.util.log('File tree\n' + archy(file.tree));
-			once = true;
-		}
-		return file;
-	});
-};
+var show_tree_once = function () {
+  var once = false
+  return $.map(function (file) {
+    if (!once && file.tree) {
+      $.util.log('File tree\n' + archy(file.tree))
+      once = true
+    }
+    return file
+  })
+}
 
 module.exports = lazypipe()
-	.pipe($.map, extended_attributes)
-	.pipe(require('gulp-front-matter'))
-	.pipe($.marked)
-////	.pipe(resolve_wiki_links)
-	.pipe($.filetree)
-	.pipe(show_tree_once)
-	.pipe(render_tmpl)
-	.pipe($.size)
+  .pipe($.map, extended_attributes)
+  .pipe(require('gulp-front-matter'))
+  .pipe($.marked)
+  // //	.pipe(resolve_wiki_links)
+  .pipe($.filetree)
+  .pipe(show_tree_once)
+  .pipe(render_tmpl)
+  .pipe($.size)
