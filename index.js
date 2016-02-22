@@ -1,13 +1,12 @@
 // cheapo gulp-load-plugins
-var $ = {}; [
-  'map',
-  'marked',
-  'util',
-  'filetree',
-  'size'
-].forEach(function (plugin) {
-  $[plugin.replace('-', '')] = require('gulp-' + plugin)
-})
+var $ = {
+  map: require('gulp-map'),
+  markdown: require('gulp-markdown'),
+  util: require('gulp-util'),
+  filetree: require('gulp-filetree'),
+  size: require('gulp-size'),
+  frontMatter: require('gulp-front-matter')
+}
 
 var path = require('path')
 var lazypipe = require('lazypipe')
@@ -142,8 +141,8 @@ var show_tree_once = function () {
 
 module.exports = lazypipe()
   .pipe($.map, extended_attributes)
-  .pipe(require('gulp-front-matter'))
-  .pipe($.marked)
+  .pipe($.frontMatter)
+  .pipe($.markdown)
   // //	.pipe(resolve_wiki_links)
   .pipe($.filetree)
   .pipe(show_tree_once)
